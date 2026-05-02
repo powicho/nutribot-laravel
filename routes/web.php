@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NutriController; // Importamos tu controlador
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Ruta principal que llama al controlador
+Route::get('/', [NutriController::class, 'index']);
