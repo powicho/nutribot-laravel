@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- ESTO BLINDA LA SEGURIDAD AJAX -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NutriBot - Transformación Inteligente</title>
@@ -253,6 +255,16 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        // Configuración global de seguridad para AJAX
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+        $(document).ready(function() {
+            // ... todo tu código actual ...
+            });
         $(document).ready(function() {
             $('#formNutri').on('submit', function(e) {
                 e.preventDefault(); // BLOQUEA el parpadeo de la página
