@@ -59,11 +59,16 @@ class NutriController extends Controller
                    {\"desayuno\":\"texto\",\"almuerzo\":\"texto\",\"merienda\":\"texto\",\"cena\":\"texto\"}";
 
         try {
-            // Mandamos la petición HTTP POST a Google
-            $response = Http::withHeaders(['Content-Type' => 'application/json'])->post($url, [
-                'contents' => [['parts' => [['text' => $prompt]]]]
+            $response = Http::post($url, [
+                'contents' => [['parts' => [['text' => $prompt]]]] 
             ]);
 
+            if ($response->status() == 429) {
+                return response()->json([
+                    'status' => 'error', 
+                    'message' => '¡NutriBot está procesando muchas dietas! Por favor, espera 60 segundos y reintenta.'
+            ]);
+        }
             if ($response->successful()) {
                 $resData = $response->json();
                 
@@ -83,14 +88,69 @@ class NutriController extends Controller
                 // DEVOLVEMOS LA RESPUESTA FINAL AL FRONTEND (AJAX)
                 return response()->json([
                     'status' => 'success',
+                      'id_registro' => $dieta->id, // ESTO ES CLAVE PARA FUTURAS CONSULTAS
                     'nombre' => $nombre,
                     'calorias' => $calorias,
                     'dieta' => $arrayDieta
                 ]);
             }
             return response()->json(['status' => 'error', 'message' => 'Falla en el servicio de IA']);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Error de conexión']);
-        }
+           } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => 'Falla de red. Verifica tu internet.']);
     }
+    }
+            /**
+         * MÉTODO DE LA FASE 4: API REST
+         * Este método es consumido por aplicaciones móviles o externas.
+         * Devuelve el historial de todas las dietas generadas.
+         */
+        public function getApiResultados()
+        {
+            // 1. Obtenemos todos los registros de la tabla 'dietas'
+            // Los ordenamos por los más recientes primero
+            $dietas = Dieta::orderBy('created_at', 'desc')->get();
+
+            // 2. Respondemos con el paquete JSON completo
+            // No usamos 'return view', porque las apps móviles no entienden HTML, solo JSON.
+            return response()->json([
+                'status' => 'success',
+                'cantidad' => $dietas->count(),
+                'datos' => $dietas
+            ], 200); // El código 200 significa "Todo está OK"
+    }
+        public function chatear(Request $request) {
+            // 1. Buscamos la dieta
+            $dieta = Dieta::find($request->dieta_id);
+            
+            // Si no existe (porque refrescaste la DB), avisamos al usuario
+            if (!$dieta) {
+                return response()->json(['respuesta' => 'Lo siento, no encuentro el registro de tu dieta. Por favor, genera una nueva.']);
+            }
+
+            $apiKey = env('GEMINI_API_KEY');
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" . $apiKey;
+
+            $prompt = "Contexto: La dieta generada fue: " . $dieta->resultado_ia . ". 
+                    Duda del usuario: '$request->pregunta'. 
+                    Responde breve y profesional en 2 frases.";
+
+            try {
+                $response = Http::post($url, [
+                    'contents' => [['parts' => [['text' => $prompt]]]]
+                ]);
+
+                $data = $response->json();
+                
+                // Verificamos si Google bloqueó por "groserías" o seguridad
+                if (isset($data['candidates'][0]['finishReason']) && $data['candidates'][0]['finishReason'] == 'SAFETY') {
+                    return response()->json(['respuesta' => 'Lo siento, no puedo responder a eso por mis políticas de seguridad. Mantengamos la duda sobre nutrición.']);
+                }
+
+                $respuestaIA = $data['candidates'][0]['content']['parts'][0]['text'] ?? "Lo siento, mi conexión falló.";
+                return response()->json(['respuesta' => $respuestaIA]);
+
+            } catch (\Exception $e) {
+                return response()->json(['respuesta' => 'Hubo un problema de conexión con la IA.']);
+            }
+        }
 }

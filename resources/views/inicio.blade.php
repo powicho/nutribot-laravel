@@ -112,6 +112,58 @@
             animation: slideIn 0.5s ease;
         }
 
+        /* MEJORA VISUAL DEL CHAT (Firma Luis) */
+        #seccion-chat {
+            background: hsl(172, 63%, 54%); /* Fondo sutil para separar del formulario */
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        #historial-chat {
+            background: rgb(255, 255, 255); /* Fondo más claro para lectura */
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        /* Ajuste de tamaño de fuente para todo el chat */
+        .msg {
+            padding: 12px 18px; /* Un poco más de espacio por la letra grande */
+            border-radius: 15px;
+            margin-bottom: 12px;
+            max-width: 90%;
+            font-size: 1.8rem;   /* ESTO HACE LA LETRA MÁS GRANDE Y CLARA */
+            line-height: 1.5;    /* Separa un poco las líneas para que sea cómodo de leer */
+            display: inline-block;
+            clear: both;
+            font-weight: 500;    /* Un toque de grosor extra para que resalte */
+        }
+
+        .msg-usuario {
+            background-color: var(--brand-green);
+            color: white;
+            float: right;
+            border-bottom-right-radius: 2px;
+            box-shadow: 0 4px 10px rgba(45, 122, 77, 0.2); /* Sombra suave */
+        }
+
+        .msg-bot {
+            background-color: white;
+            color: #222;
+            float: left;
+            border-bottom-left-radius: 2px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Sombra suave */
+        }
+
+        /* Limpiar el flotado para que el historial no se rompa */
+        #historial-chat::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
         @keyframes slideIn { from {opacity: 0; transform: translateY(20px);} to {opacity: 1; transform: translateY(0);} }
     </style>
 </head>
@@ -173,15 +225,28 @@
                 </form>
             </div>
 
-            <!-- RESULTADO DINÁMICO (Oculto al inicio) -->
+            <!-- RESULTADO DINÁMICO -->
             <div id="resultado-dieta" class="d-none mt-4">
                 <h3 class="fw-bold text-success text-center">🍏 Tu Plan Personalizado</h3>
                 <p id="calorias-info" class="text-center badge bg-success w-100 fs-6 py-2"></p>
                 <hr>
                 <div id="contenido-dieta" class="lh-lg"></div>
             </div>
+
+            <!-- SECCIÓN DE CHAT DE SEGUIMIENTO (Firma de Luis) -->
+            <div id="seccion-chat" class="mt-4 border-top pt-3 d-none">
+                <p class="text-muted small">¿Tienes dudas sobre esta dieta? Pregúntale a NutriBot:</p>
+                <div id="historial-chat" class="mb-3" style="max-height: 200px; overflow-y: auto; font-size: 0.9em;">
+                    <!-- Aquí aparecerán las preguntas y respuestas -->
+                </div>
+                <div class="input-group">
+                    <input type="text" id="pregunta-chat" class="form-control mb-0" placeholder="Ej: ¿Puedo cambiar alguna comida?">
+                    <button class="btn btn-success" id="btn-preguntar" style="border-radius: 0 12px 12px 0;">Enviar</button>
+                </div>
+            </div>
         </div>
     </div>
+
 
     <!-- SCRIPTS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -219,6 +284,12 @@
 
                             // Alerta final
                             Swal.fire('¡Éxito!', 'Tu dieta ha sido creada.', 'success');
+                            
+                            // ... dentro de if(res.status == 'success') ...
+                            $('#seccion-chat').removeClass('d-none'); // Mostrar el chat
+                            window.ultimoDietaId = res.id_registro; // Guardamos el ID para tener memoria
+
+
                         } else {
                             Swal.fire('Atención', res.message, 'warning');
                         }
@@ -231,8 +302,40 @@
                         btn.prop('disabled', false).text('🚀 Generar mi dieta');
                     }
                 });
+
             });
         });
+         // EVENTO PARA EL CHAT DE SEGUIMIENTO
+            $(document).on('click', '#btn-preguntar', function() {
+                let pregunta = $('#pregunta-chat').val();
+                if(pregunta == "") return;
+
+                let btn = $(this);
+                btn.prop('disabled', true).text('...');
+                
+                // Añadimos tu pregunta visualmente al chat
+                $('#historial-chat').append(`<p class='text-end'><b>Tú:</b> ${pregunta}</p>`);
+                $('#pregunta-chat').val(''); // Limpiamos el input
+
+                $.ajax({
+                    url: "{{ route('nutri.chat') }}",
+                    method: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        pregunta: pregunta,
+                        dieta_id: window.ultimoDietaId // Le mandamos el ID para que sepa de qué hablamos
+                    },
+                    success: function(res) {
+                        // Añadimos la respuesta del Bot
+                        $('#historial-chat').append(`<p class='text-start text-success'><b>NutriBot:</b> ${res.respuesta}</p>`);
+                        // Scroll automático hacia abajo
+                        $('#historial-chat').scrollTop($('#historial-chat')[0].scrollHeight);
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).text('Enviar');
+                    }
+                });
+});
     </script>
 </body>
 </html>
