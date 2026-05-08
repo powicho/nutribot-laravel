@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NutriController; //se importa controlador 
 use Illuminate\Http\Request; //para la traduccion de datos http a php
-
+use App\Models\Dieta;
 
 // Ruta principal que llama al controlador
 Route::get('/', [NutriController::class, 'index']);

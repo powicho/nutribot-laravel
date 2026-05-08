@@ -13,6 +13,7 @@ return new class extends Migration
 {
     Schema::create('dietas', function (Blueprint $table) {
         $table->id();
+        $table->string('nombre'); // Nuevo campo para el nombre del usuario
         $table->integer('edad');
         $table->float('peso');
         $table->float('altura');
