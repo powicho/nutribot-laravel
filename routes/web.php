@@ -21,6 +21,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // PUNTO 3: Ruta del Historial (Nueva)
     Route::get('/historial', [NutriController::class, 'historial'])->name('nutri.historial');
+
+    // Ruta para ver el detalle de una dieta específica
+    Route::get('/historial/{id}', [NutriController::class, 'verDetalle'])->name('nutri.detalle');
 });
 
 

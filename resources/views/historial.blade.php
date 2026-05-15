@@ -15,6 +15,7 @@
         body { 
             background-color: var(--soft-bg); 
             font-family: 'Poppins', sans-serif; 
+            background-color: #c5ccbb;
         }
       /* BARRA DE NAVEGACIÓN (Header) */
         .navbar {
@@ -124,7 +125,7 @@
                                 <td><span class="badge-cal">{{ $dieta->calorias_objetivo }} kcal</span></td>
                                 <td>
                                     <!-- Aquí pondremos el botón del PDF en el siguiente paso -->
-                                    <button class="btn btn-sm btn-outline-success">ver detalle</button>
+                                    <a href="{{ route('nutri.detalle', $dieta->id) }}" class="btn btn-sm btn-outline-success">ver detalle</a>
                                 </td>
                             </tr>
                             @endforeach

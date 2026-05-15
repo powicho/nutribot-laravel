@@ -10,7 +10,7 @@
     <style>
         body { 
             font-family: 'Poppins', sans-serif; 
-            background-color: #fdfdfd;
+            background-color: #d7e2ca;
          }
 
         .hero-section { 
@@ -33,19 +33,22 @@
 
         .btn-login { 
             background-color: #7ef17e; 
-            color: #333;
+            color: #000000;
              margin-right: 10px;
+             border: 2px solid #000000;
          }
 
         .btn-register { 
             background-color: #7ef17e; 
-            color: #333; 
+            color: #000000; 
+             border: 2px solid #000000;
         }
 
         .btn-custom:hover { 
             transform: scale(1.05); 
             filter: brightness(0.9); 
         }
+
 
     </style>
 
@@ -56,7 +59,7 @@
     <div class="container hero-section">
         <img src="https://img.icons8.com/color/96/apple.png" alt="NutriBot" class="mb-3">
         <h1 class="fw-bold text-success mb-4">NutriBot</h1>
-        <p class="lead mb-5 px-4" style="max-width: 800px;">
+        <p class= "lead mb-5 px-4" style="max-width: 1100px;">
             Bienvenido a nutri bot, esta página especializada en apoyarte en tu orden alimenticio el cual será útil para tu gran cambio físico. Esta página utiliza una inteligencia artificial especializada en apoyar al usuario dándole las herramientas necesarias para que pueda comprender lo necesario.
         </p>
 

@@ -61,6 +61,10 @@ class NutriController extends Controller
         $dieta->calorias_objetivo = $calorias;
         $dieta->save(); 
 
+
+
+
+
         // --- 4. CONECTAR CON IA (GOOGLE GEMINI) ---
         $apiKey = env('GEMINI_API_KEY'); // Lee la clave del archivo .env
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" . $apiKey;
@@ -71,6 +75,8 @@ class NutriController extends Controller
                    Escribe una propuesta de comida (desayuno, almuerzo, merienda, cena) muy variada.
                    IMPORTANTE: Responde ÚNICAMENTE un objeto JSON así: 
                    {\"desayuno\":\"texto\",\"almuerzo\":\"texto\",\"merienda\":\"texto\",\"cena\":\"texto\"}";
+
+
 
         try {
             $response = Http::post($url, [
@@ -112,6 +118,11 @@ class NutriController extends Controller
            } catch (\Exception $e) {
         return response()->json(['status' => 'error', 'message' => 'Falla de red. Verifica tu internet.']);
     }
+
+
+
+
+
     }
             /**
          * MÉTODO DE LA FASE 4: API REST
@@ -132,6 +143,10 @@ class NutriController extends Controller
                 'datos' => $dietas
             ], 200); // El código 200 significa "Todo está OK"
     }
+
+
+
+
         public function chatear(Request $request) {
             // 1. Buscamos la dieta
             $dieta = Dieta::find($request->dieta_id);
@@ -167,6 +182,10 @@ class NutriController extends Controller
                 return response()->json(['respuesta' => 'Hubo un problema de conexión con la IA.']);
             }
 
+
+            
+
+
                     }
              /*El Historial de Dietas del Usuario*/
             public function historial()
@@ -177,5 +196,20 @@ class NutriController extends Controller
                             ->get();
 
                 return view('historial', compact('dietas'));
+            }
+
+
+
+
+
+            public function verDetalle($id)
+            {
+                // Buscamos la dieta pero asegurando que pertenezca al usuario logueado
+                $dieta = Dieta::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+
+                // Decodificamos el JSON que guardó la IA para poder mostrarlo por partes
+                $datosDieta = json_decode($dieta->resultado_ia, true);
+
+                return view('detalle', compact('dieta', 'datosDieta'));
             }
 }

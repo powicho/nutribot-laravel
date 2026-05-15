@@ -22,12 +22,21 @@
         body {
             background-color: var(--bg-color);
             font-family: 'Poppins', sans-serif;
-            color: #333;
+            color: #000000;
+            font-size: 20px;
+            background-color: #c5ccbb;
         }
+        
+        .text-muted {
+             font-size: 21px;
+             color: #000000;
+             font-weight: 600;
+        }
+      
 
         /* BARRA DE NAVEGACIÓN (Header) */
         .navbar {
-            background-color: #cee0b2; /* Verde pastel del fondo */
+            background-color: #cae0a6; /* Verde pastel del fondo */
             padding: 10px 40px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
@@ -166,7 +175,7 @@
 
         /* MEJORA VISUAL DEL CHAT (Firma Luis) */
         #seccion-chat {
-            background: hsl(172, 63%, 54%); /* Fondo sutil para separar del formulario */
+            background: #c5ccbb; /* Fondo sutil para separar del formulario */
             border-radius: 20px;
             padding: 20px;
         }
@@ -175,7 +184,7 @@
             background: rgb(255, 255, 255); /* Fondo más claro para lectura */
             border-radius: 15px;
             padding: 15px;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 2px solid rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
         }
 
@@ -202,10 +211,10 @@
 
         .msg-bot {
             background-color: white;
-            color: #222;
+            color: #000000;
             float: left;
             border-bottom-left-radius: 2px;
-            border: 1px solid #ddd;
+            border: 2px solid #030303;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Sombra suave */
         }
 
