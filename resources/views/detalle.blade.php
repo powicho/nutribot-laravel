@@ -87,8 +87,14 @@
                         <li>⚖️ Peso: <b>{{ $dieta->peso }} kg</b></li>
                         <li>🔥 Meta: <b>{{ $dieta->calorias_objetivo }} kcal</b></li>
                     </ul>
+                        <!-- BOTÓN ROJO DE PDF -->
+    <a href="{{ route('nutri.pdf', $dieta->id) }}" class="btn w-100 py-3" style="background-color: #e74c3c; color: white; border-radius: 12px; font-weight: 600; font-size: 14px; text-decoration: none; display: block; text-align: center; transition: 0.3s;">
+        📥 Descargar en PDF
+    </a>
                 </div>
+                
             </div>
+            
 
             <!-- Principal: La Dieta y el Chat Continuo -->
             <div class="col-md-8">
@@ -116,28 +122,6 @@
         </div>
     </div>
 
-    <!-- Incluye jQuery y SweetAlert como en las otras páginas -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        // Aquí usas el MISMO código de AJAX del chat que ya tienes
-        window.ultimoDietaId = "{{ $dieta->id }}";
-        
-        $(document).on('click', '#btn-preguntar', function() {
-            let pregunta = $('#pregunta-chat').val();
-            if(!pregunta) return;
-            
-            $('#historial-chat').append(`<p class='text-end'><b>Tú:</b> ${pregunta}</p>`);
-            $('#pregunta-chat').val('');
 
-            $.ajax({
-                url: "{{ route('nutri.chat') }}", // Reusamos la misma ruta del chat
-                method: "POST",
-                data: { _token: "{{ csrf_token() }}", pregunta: pregunta, dieta_id: window.ultimoDietaId },
-                success: function(res) {
-                    $('#historial-chat').append(`<p class='text-start text-success'><b>NutriBot:</b> ${res.respuesta}</p>`);
-                }
-            });
-        });
-    </script>
 </body>
 </html>

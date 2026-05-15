@@ -320,7 +320,10 @@
 
             <!-- SECCIÓN DE CHAT DE SEGUIMIENTO (Firma de Luis) -->
             <div id="seccion-chat" class="mt-4 border-top pt-3 d-none">
-                <p class="text-muted small">¿Tienes dudas sobre esta dieta? Pregúntale a NutriBot:</p>
+                <p class="text-muted small">¿Tienes dudas sobre esta dieta? Pregúntale a NutriBot:  </p>
+                <p class="text-muted">(consulta tus dietas en el boton de mi historial)</p>
+                    
+              
                 <div id="historial-chat" class="mb-3" style="max-height: 200px; overflow-y: auto; font-size: 0.9em;">
                     <!-- Aquí aparecerán las preguntas y respuestas -->
                 </div>
@@ -378,7 +381,7 @@
                             $('#contenido-dieta').html(html);
 
                             // Alerta final
-                            Swal.fire('¡Éxito!', 'Tu dieta ha sido creada.', 'success');
+                            Swal.fire('¡Éxito!', 'Tu dieta ha sido creada y guardada, puedes verla en el boton de mi historial.', 'success');
                             
                             // ... dentro de if(res.status == 'success') ...
                             $('#seccion-chat').removeClass('d-none'); // Mostrar el chat

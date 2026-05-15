@@ -24,6 +24,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Ruta para ver el detalle de una dieta específica
     Route::get('/historial/{id}', [NutriController::class, 'verDetalle'])->name('nutri.detalle');
+
+    // Ruta para descargar el PDF de una dieta específica
+    Route::get('/historial/{id}/descargar-pdf', [NutriController::class, 'descargarPdf'])->name('nutri.pdf');
+
+    // Ruta para eliminar una dieta específica
+    Route::delete('/historial/{id}', [NutriController::class, 'eliminar'])->name('nutri.eliminar');
 });
 
 

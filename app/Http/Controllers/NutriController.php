@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Dieta; // Conexión con la Base de Datos
 use Illuminate\Support\Facades\Http; // Motor para peticiones API externa
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class NutriController extends Controller
 {
@@ -183,10 +184,10 @@ class NutriController extends Controller
             }
 
 
-            
 
 
-                    }
+
+            }
              /*El Historial de Dietas del Usuario*/
             public function historial()
             {
@@ -211,5 +212,33 @@ class NutriController extends Controller
                 $datosDieta = json_decode($dieta->resultado_ia, true);
 
                 return view('detalle', compact('dieta', 'datosDieta'));
+            }
+
+
+
+
+
+            public function descargarPdf($id)
+            {
+                $dieta = Dieta::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+                $datosDieta = json_decode($dieta->resultado_ia, true);
+
+                // Cargamos una vista especial simplificada para el PDF
+                $pdf = Pdf::loadView('pdf_dieta', compact('dieta', 'datosDieta'));
+
+                // Retornamos la descarga con un nombre personalizado
+                return $pdf->download('Dieta_NutriBot_'.auth()->user()->name.'.pdf');
+            }
+
+
+
+            public function eliminar($id)
+            {
+                // Buscamos la dieta asegurando que sea del usuario logueado
+                $dieta = Dieta::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+                
+                $dieta->delete(); // ¡Adiós registro!
+
+                return redirect()->route('nutri.historial')->with('success', 'Dieta eliminada correctamente');
             }
 }

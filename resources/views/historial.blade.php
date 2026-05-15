@@ -26,6 +26,7 @@
             .img-fluid{
             width: 50px;
         }
+
         .navbar-brand {
             font-size: 28px;
             font-weight: 600;
@@ -34,10 +35,19 @@
             align-items: center;
             gap: 15px;
         }
+
         .container { margin-top: 50px; 
         max-width: 1000px; 
         }
         
+
+        /* Para que la caja de acciones no se vea desordenada */
+        .acciones-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .glass-table-card { 
             background: white; 
             border-radius: 25px; 
@@ -59,6 +69,13 @@
         .table tbody tr:hover {
              background-color: #f9fff0;
         }
+
+        /* Centrado perfecto de todas las celdas */
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle; /* Centrado vertical */
+        }
+
         
         .badge-cal { 
             background-color: #f1e9c9; 
@@ -82,6 +99,15 @@
             filter: brightness(1.1); 
             transform: scale(1.05); 
             color: white; }
+
+        /* Divisor vertical entre los botones de acción */
+        .btn-separator {
+            width: 1px;
+            height: 25px;
+            background-color: #ddd;
+            margin: 0 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -107,15 +133,16 @@
             @else
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead>
+                       <thead>
                             <tr>
                                 <th>Fecha</th>
                                 <th>Peso / Altura</th>
                                 <th>Objetivo</th>
                                 <th>Calorías</th>
-                                <th>Acción</th>
+                                <th>Acciones</th> <!-- Unimos las dos columnas -->
                             </tr>
                         </thead>
+
                         <tbody>
                             @foreach($dietas as $dieta)
                             <tr>
@@ -127,6 +154,17 @@
                                     <!-- Aquí pondremos el botón del PDF en el siguiente paso -->
                                     <a href="{{ route('nutri.detalle', $dieta->id) }}" class="btn btn-sm btn-outline-success">ver detalle</a>
                                 </td>
+
+                                <td class="d-flex gap-2">
+                                <!-- FORMULARIO DE ELIMINACIÓN -->
+                                <form action="{{ route('nutri.eliminar', $dieta->id) }}" method="POST" class="form-eliminar">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        🗑️ 
+                                    </button>
+                                </form>
+                            </td>
                             </tr>
                             @endforeach
                         </tbody>
