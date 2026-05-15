@@ -122,6 +122,28 @@
         </div>
     </div>
 
+    <!-- Incluye jQuery y SweetAlert como en las otras páginas -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Aquí usas el MISMO código de AJAX del chat que ya tienes
+        window.ultimoDietaId = "{{ $dieta->id }}";
+        
+        $(document).on('click', '#btn-preguntar', function() {
+            let pregunta = $('#pregunta-chat').val();
+            if(!pregunta) return;
+            
+            $('#historial-chat').append(`<p class='text-end'><b>Tú:</b> ${pregunta}</p>`);
+            $('#pregunta-chat').val('');
 
+            $.ajax({
+                url: "{{ route('nutri.chat') }}", // Reusamos la misma ruta del chat
+                method: "POST",
+                data: { _token: "{{ csrf_token() }}", pregunta: pregunta, dieta_id: window.ultimoDietaId },
+                success: function(res) {
+                    $('#historial-chat').append(`<p class='text-start text-success'><b>NutriBot:</b> ${res.respuesta}</p>`);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

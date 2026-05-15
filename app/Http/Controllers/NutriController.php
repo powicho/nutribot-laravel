@@ -241,4 +241,7 @@ class NutriController extends Controller
 
                 return redirect()->route('nutri.historial')->with('success', 'Dieta eliminada correctamente');
             }
+
+
+            
 }
