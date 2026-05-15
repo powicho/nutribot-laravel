@@ -15,15 +15,24 @@ class NutriController extends Controller
 
     public function calcular(Request $request)
     {
-        // --- 1. RECOGER DATOS ---
-        $nombre = $request->input('nombre', 'Amigo');
+ 
+        // --- 1. RECOGER DATOS (AQUI ESTÁ EL CAMBIO MAESTRO) ---
+        // Si hay un usuario logueado, tomamos sus datos del sistema. Si no, es invitado.
+        if (auth()->check()) {
+            $nombre = auth()->user()->name;  // Su nombre real de la cuenta
+            $user_id = auth()->id();        // Su ID para el historial
+        } else {
+            $nombre = $request->input('nombre', 'Amigo');
+            $user_id = null;                // Los invitados no tienen historial personal
+        }
+
         $peso = $request->input('peso');
         $altura = $request->input('altura');
         $edad = $request->input('edad');
         $genero = $request->input('genero');
         $actividad = $request->input('nivel_actividad');
         $objetivo = $request->input('objetivo');
-
+        
         // --- 2. CÁLCULO DE CALORÍAS (Fórmula Mifflin-St Jeor) ---
         // Si es masculino: (10*kg) + (6.25*cm) - (5*años) + 5
         // Si es femenino: (10*kg) + (6.25*cm) - (5*años) - 161
@@ -36,16 +45,21 @@ class NutriController extends Controller
         if ($objetivo == 'perder') $calorias -= 500;
         if ($objetivo == 'ganar') $calorias += 500;
 
-        // --- 3. GUARDAR EN BASE DE DATOS ---
+
+        // --- 3. GUARDAR EN BASE DE DATOS (NUEVO CAMPO DE USUARIO) ---
         $dieta = new Dieta();
+        $dieta->user_id = $user_id; // <-- VINCULAMOS LA DIETA AL USUARIO
         $dieta->nombre = $nombre;
         $dieta->peso = $peso;
         $dieta->altura = $altura;
         $dieta->edad = $edad;
         $dieta->genero = $genero;
         $dieta->nivel_actividad = $actividad;
+
+        // LÍNEA NUEVA (Faltaba esta asignación):
+        $dieta->objetivo = $request->input('objetivo'); // Guardamos el objetivo también
         $dieta->calorias_objetivo = $calorias;
-        $dieta->save(); // El ID de la dieta se guarda aquí
+        $dieta->save(); 
 
         // --- 4. CONECTAR CON IA (GOOGLE GEMINI) ---
         $apiKey = env('GEMINI_API_KEY'); // Lee la clave del archivo .env
@@ -152,5 +166,16 @@ class NutriController extends Controller
             } catch (\Exception $e) {
                 return response()->json(['respuesta' => 'Hubo un problema de conexión con la IA.']);
             }
-        }
+
+                    }
+             /*El Historial de Dietas del Usuario*/
+            public function historial()
+            {
+                // Buscamos solo las dietas que pertenecen al usuario que tiene la sesión abierta
+                $dietas = Dieta::where('user_id', auth()->id())
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+
+                return view('historial', compact('dietas'));
+            }
 }

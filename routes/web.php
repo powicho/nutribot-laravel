@@ -1,15 +1,33 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\NutriController; //se importa controlador 
-use Illuminate\Http\Request; //para la traduccion de datos http a php
-use App\Models\Dieta;
+use App\Http\Controllers\NutriController; 
+Route::get('/', function () {
+    return view('welcome');
+})->name('inicio');
 
-// Ruta principal que llama al controlador
-Route::get('/', [NutriController::class, 'index']);
 
-// Esta ruta recibirá los datos del formulario por POST
-Route::post('/calcular-calorias', [NutriController::class, 'calcular'])->name('nutri.calcular');
+// 2. NutriBot App (Solo para logueados)
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Vista Principal
+    Route::get('/dashboard', [NutriController::class, 'index'])->name('dashboard');
+    
+    // Cálculo de Calorías e IA
+    Route::post('/calcular-calorias', [NutriController::class, 'calcular'])->name('nutri.calcular');
 
-// Verifica que esta línea esté en routes/web.php y guardada:
-Route::post('/chat-seguimiento', [NutriController::class, 'chatear'])->name('nutri.chat');
+    // RUTA QUE DABA EL ERROR (El Chat)
+    Route::post('/chat-seguimiento', [NutriController::class, 'chatear'])->name('nutri.chat');
+
+    // PUNTO 3: Ruta del Historial (Nueva)
+    Route::get('/historial', [NutriController::class, 'historial'])->name('nutri.historial');
+});
+
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';

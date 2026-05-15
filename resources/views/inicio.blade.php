@@ -32,6 +32,9 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
+        .img-fluid{
+            width: 50px;
+        }
         .navbar-brand {
             font-size: 28px;
             font-weight: 600;
@@ -40,6 +43,53 @@
             align-items: center;
             gap: 15px;
         }
+   
+        .user-name {
+            color: var(--brand-green);
+            font-weight: 600;
+            font-size: 24px;
+        }
+
+        /* BOTÓN DE HISTORIAL INNOVADOR */
+        .btn-historial {
+            background: white;
+            color: var(--brand-green);
+            border: 2px solid var(--brand-green);
+            border-radius: 50px;
+            padding: 8px 25px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-transform: lowercase;
+        }
+
+        .btn-historial:hover {
+            background: var(--brand-green);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(45, 122, 77, 0.3) !important;
+        }
+
+        /* BOTÓN SALIR (LOGOUT) */
+        .btn-logout {
+            background: transparent;
+            color: #e74c3c; /* Un rojo más moderno (Vibrant Red) */
+            border: 2px solid #e74c3c;
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 5px 15px;
+            font-weight: 600;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: #fdf2f2; /* Sutil fondo rojo */
+            color: #c0392b;
+            transform: scale(1.05);
+        }
+
 
         /* CONTENEDOR PRINCIPAL DEL CHATBOT */
         .main-card-container {
@@ -172,11 +222,28 @@
 <body>
 
     <!-- NAVBAR CENTRADA -->
-    <nav class="navbar d-flex justify-content-center">
-        <a class="navbar-brand" href="#">
-            <img src="https://img.icons8.com/color/96/apple.png" alt="Logo" width="45">
+    <nav class="navbar d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" href="{{ route('inicio') }}">
+            <img class="img-fluid" src="https://img.icons8.com/color/96/apple.png" alt="Apple Logo">
             NutriBot
         </a>
+        
+@auth
+    <div class="d-flex align-items-center gap-4 pe-3">
+
+        <!-- Botón Historial -->
+        <a href="{{ route('nutri.historial') }}" class="btn-nav btn-historial shadow-sm">
+            mi historial
+        </a>
+
+        <!-- Botón de Cerrar Sesión -->
+        <form method="POST" action="{{ route('logout') }}" class="m-0">
+            @csrf
+            <button type="submit" class="btn-logout">Salir</button>
+        </form>
+    </div>
+@endauth
+
     </nav>
 
     <div class="container text-center mt-5 mb-5">
@@ -191,7 +258,14 @@
                 <!-- FORMULARIO SIN RECARGA -->
                 <form id="formNutri">
                     @csrf
-                    <input type="text" class="form-control" name="nombre" placeholder="¿Cómo te llamas?" required>
+                    @guest
+                        <!-- Este input solo aparece si el usuario NO ha iniciado sesión (Invitado) -->
+                        <input type="text" class="form-control" name="nombre" placeholder="¿Cómo te llamas?" required>
+                    @endguest
+                    @auth
+                        <!-- Si ya inició sesión, solo le mostramos un saludo cálido -->
+                        <h4 class="mb-4 fw-bold">Hola, {{ auth()->user()->name }} 🍎</h4>
+                    @endauth
                     <input type="number" class="form-control" name="peso" placeholder="Peso (kg)" required>
                     <input type="number" class="form-control" name="altura" placeholder="Altura (cm)" required>
                     <input type="number" class="form-control" name="edad" placeholder="Edad" required>
